@@ -9,17 +9,19 @@ globalThis.FinanceCalculations = (() => {
     }), { budget: 0, actual: 0, transactions: 0 });
   }
 
-  // Positive expense variance means spending is over budget (unfavorable).
+  // Positive is unfavorable, negative is favorable, and zero is on budget.
   function variance(actual, budget) {
     return actual - budget;
   }
 
   // null means the ratio is undefined; the page displays it as N/A.
   function variancePercent(actual, budget) {
+    // For a selection, pass total actual and total budget, never average row ratios.
     return budget === 0 ? null : variance(actual, budget) / budget * 100;
   }
 
   function costPerTransaction(actual, transactions) {
+    // For a selection, pass total actual and total transaction count.
     return transactions === 0 ? null : actual / transactions;
   }
 
@@ -51,6 +53,7 @@ globalThis.FinanceCalculations = (() => {
   }
 
   function scenario(summary, adjustment) {
+    // Return a new result; never assign to summary.actual or a source record.
     if (!validAdjustment(adjustment)) return null;
     const expense = summary.actual * (1 + adjustment / 100);
     return {

@@ -3,19 +3,21 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Retail Finance Lab</title>
+    <title>Retail Expense Performance | Finance Lab</title>
     <link rel="stylesheet" href="./styles.css">
     <script defer src="./data.js"></script>
     <script defer src="./calculations.js"></script>
     <script defer src="./app.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to dashboard</a>
     <header>
-      <small>Analyst practice workspace / 01</small>
-      <h1>Retail Finance Lab</h1>
-      <p>Explore expense performance. Test a scenario. Explain the business impact.</p>
+      <small>Retail Finance Lab · Portfolio project</small>
+      <h1>Retail Expense Performance</h1>
+      <span class="fictional-badge">Fictional data · For demonstration only</span>
+      <p>Explore fictional expense summaries. Test a scenario. Explain the business impact.</p>
     </header>
-    <main>
+    <main id="main" tabindex="-1">
       <noscript>This dashboard needs JavaScript enabled to display its sample data.</noscript>
       <section class="panel toolbar" aria-label="Filters">
         <div>
@@ -32,9 +34,10 @@
         </div>
         <button id="reset">Reset filters</button>
       </section>
-      <div class="actions">
+      <div class="selection-summary">
+        <p id="activeFilters" class="filter-summary" role="status" aria-atomic="true"></p>
         <strong id="count"></strong>
-        <span class="muted">Fictional data · Jan–May 2026 · USD</span>
+        <span class="muted">Jan–May 2026 · USD · Amounts rounded to whole dollars; percentages to 1 decimal</span>
       </div>
       <section class="cards" id="cards" aria-label="Key metrics"></section>
       <section class="panel">
@@ -44,78 +47,84 @@
       <div class="charts">
         <section class="panel">
           <h2>Expense variance by department</h2>
-          <p class="muted">Actual minus budget · red = over budget · green = under budget</p>
+          <p class="muted">Actual minus budget · Positive = unfavorable; negative = favorable. Bar length shows the size of the variance.</p>
           <div id="departmentChart"></div>
         </section>
         <section class="panel">
           <h2>Monthly budget vs. actual</h2>
+          <p class="muted">Budget and recorded actual expenses for the current selection.</p>
           <div class="legend muted">
             <span>
-              <i class="dot budget"></i>Budget</span>
-              <span>
-                <i class="dot actual"></i>Actual</span>
-              </div>
-              <div id="monthChart"></div>
-            </section>
+              <i class="dot budget" aria-hidden="true"></i>Budget</span>
+            <span>
+              <i class="dot actual" aria-hidden="true"></i>Actual</span>
           </div>
-          <section class="panel scenario">
-            <h2>What-if expense scenario</h2>
-            <p class="muted">Applies to the current filtered selection. Recorded actuals remain unchanged.</p>
-            <label for="adjustment">Change expenses by (%) — use a negative number for savings</label>
-            <div class="actions">
-              <input id="adjustment" type="number" min="-100" max="200" step="0.5" value="0">
-              <button id="saveScenario">Save scenario setting</button>
-              <button id="clearScenario" class="secondary">Reset scenario</button>
-              <span id="saveStatus" role="status"></span>
-            </div>
-            <p id="scenarioResult" aria-live="polite"></p>
-            <p id="notice" role="alert"></p>
-          </section>
-          <section class="panel">
-            <div class="actions">
-              <h2 class="table-heading">Transaction-level practice data</h2>
-              <button id="export">Export filtered CSV</button>
-            </div>
-            <p class="muted">Each record is one department–region–month expense summary. Sort applies to the table.</p>
-            <div class="actions">
-              <label for="sort">Sort rows</label>
-              <select id="sort">
-                <option value="id">Record ID</option>
-                <option value="variance">Largest expense overrun</option>
-                <option value="actual">Highest actual spending</option>
-              </select>
-            </div>
-            <div class="tablewrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Month</th>
-                    <th>Department</th>
-                    <th>Region</th>
-                    <th>Budget</th>
-                    <th>Actual</th>
-                    <th>Variance</th>
-                    <th>Variance %</th>
-                    <th>Transactions</th>
-                    <th>Cost / transaction</th>
-                  </tr>
-                </thead>
-                <tbody id="rows"></tbody>
-              </table>
-            </div>
-          </section>
-          <section class="panel">
-            <h2>Practice assignments</h2>
-            <ol>
-              <li>Find the department with the largest total expense overrun.</li>
-              <li>Filter to March and West. Identify the largest unfavorable variance.</li>
-              <li>Model a 5% expense reduction. Does your selection fall within budget?</li>
-              <li>Export the filtered data and reconcile the totals in Excel.</li>
-              <li>Write a three-sentence summary: result, likely questions to investigate, and next action. The data alone does not establish causes.</li>
-            </ol>
-          </section>
-          <p class="footer">Definitions: expense variance = actual − budget; variance % = total variance ÷ total budget. Cost per transaction = total actual ÷ total transactions. Positive expense variance is unfavorable. Scenario expense = actual × (1 + adjustment / 100). Dataset is synthetic and contains no Walmart information. Saved scenario settings use this browser's local storage; availability may vary for local files. No external libraries or network connection required.</p>
-        </main>
-      </body>
-    </html>
+          <div id="monthChart"></div>
+        </section>
+      </div>
+      <section class="panel scenario">
+        <h2>What-if expense scenario</h2>
+        <p class="muted">Applies to the current filtered selection. Recorded actuals remain unchanged.</p>
+        <label for="adjustment">Expense adjustment (%)</label>
+        <p id="scenarioHelp" class="muted">Enter −100% to 200%. Use a negative number to model savings. Only the adjustment is saved in this browser.</p>
+        <div class="actions">
+          <input id="adjustment" type="number" min="-100" max="200" step="0.5" value="0" aria-describedby="scenarioHelp notice">
+          <button id="saveScenario">Save scenario setting</button>
+          <button id="clearScenario" class="secondary">Reset scenario</button>
+          <span id="saveStatus" role="status"></span>
+        </div>
+        <p id="scenarioResult" class="scenario-result" aria-live="polite" aria-atomic="true"></p>
+        <p id="notice" role="alert"></p>
+      </section>
+      <section class="panel">
+        <div class="actions">
+          <h2 id="tableTitle" class="table-heading">Fictional department–region–month summaries</h2>
+          <button id="export">Export filtered CSV</button>
+        </div>
+        <p class="muted">Each record is one fictional department–region–month expense summary, not an individual transaction. Transactions is the aggregate count for that summary. Sort applies to the table.</p>
+        <div class="actions">
+          <label for="sort">Sort rows</label>
+          <select id="sort" aria-describedby="sortStatus">
+            <option value="id">Record ID</option>
+            <option value="variance">Largest expense overrun</option>
+            <option value="actual">Highest actual spending</option>
+          </select>
+        </div>
+        <p id="sortStatus" class="muted" role="status"></p>
+        <p id="tableHelp" class="muted">On smaller screens, scroll the table sideways. Keyboard users can focus the table area and use the arrow keys.</p>
+        <div class="tablewrap" role="region" aria-labelledby="tableTitle" aria-describedby="tableHelp" tabindex="0">
+          <table>
+            <caption>Fictional department–region–month expense summaries · Currency: USD</caption>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Month</th>
+                <th scope="col">Department</th>
+                <th scope="col">Region</th>
+                <th scope="col">Budget</th>
+                <th scope="col">Actual</th>
+                <th scope="col">Variance</th>
+                <th scope="col">Variance %</th>
+                <th scope="col">Assessment</th>
+                <th scope="col">Transactions</th>
+                <th scope="col">Cost / transaction</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+      <details class="panel practice">
+        <summary>Analyst practice questions</summary>
+        <ol>
+          <li>Find the department with the largest total expense overrun.</li>
+          <li>Filter to March and West. Identify the largest unfavorable variance.</li>
+          <li>Model a 5% expense reduction. Does your selection fall within budget?</li>
+          <li>Export the filtered data and reconcile the totals in Excel.</li>
+          <li>Write a three-sentence summary: result, likely questions to investigate, and next action. The data alone does not establish causes.</li>
+        </ol>
+      </details>
+      <p class="footer">Definitions: expense variance = actual − budget; variance % = total variance ÷ total budget × 100 (not an average of row percentages). Cost per transaction = total actual ÷ total transactions. A zero denominator displays N/A. Positive expense variance is unfavorable; negative expense variance is favorable; zero is on budget. Scenario expense = actual × (1 + adjustment / 100); scenarios never overwrite recorded actuals. All data is fictional and contains no Walmart information. These summaries do not establish why expenses changed. Saved scenario settings use this browser's local storage; availability may vary for local files. No external libraries or network connection required.</p>
+    </main>
+  </body>
+</html>

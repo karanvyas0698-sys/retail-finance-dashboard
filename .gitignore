@@ -28,3 +28,4 @@ tmp/
 *.tmp
 *.bak
 finance-filtered*.csv
+fictional-finance-summaries*.csv
