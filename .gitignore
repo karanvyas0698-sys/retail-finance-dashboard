@@ -1,0 +1,30 @@
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.swp
+.codex/
+
+# Local secrets (this project does not need any)
+.env
+.env.*
+.aws/
+.ssh/
+.git-credentials
+credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Optional development tools and temporary outputs
+node_modules/
+coverage/
+*.log
+.tmp/
+tmp/
+*.tmp
+*.bak
+finance-filtered*.csv
